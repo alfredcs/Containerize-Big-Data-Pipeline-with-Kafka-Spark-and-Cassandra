@@ -3,7 +3,7 @@
 set -o errexit -o nounset -o pipefail 
 
 declare -i OVERALL_RC=0
-declare PROXY="3.39.86.231"
+declare PROXY=""
 
 # Check if this is a terminal, and if colors are supported, set some basic
 # colors for outputs
@@ -52,17 +52,17 @@ function check_version() {
 
 # Pre-requsites
 function pre_requisite() {
-    apt-key adv --keyserver-options http-proxy=http://3.39.86.231:8080/ --keyserver keyserver.ubuntu.com --recv-keys E84AC2C0460F3994
+    apt-key adv --keyserver-options http-proxy=http://x.x.86.231:8080/ --keyserver keyserver.ubuntu.com --recv-keys E84AC2C0460F3994
     if [[ `grep ceph02 /etc/hosts |wc -l` -lt 1 ]]; then
-      echo "172.20.12.60 ceph01.crd.ge.com ceph01" >> /etc/hosts   
-      echo "172.20.12.61 ceph02.crd.ge.com ceph02" >> /etc/hosts   
-      echo "172.20.12.62 ceph03.crd.ge.com ceph03" >> /etc/hosts   
-      echo "172.20.12.63 ceph04.crd.ge.com ceph04" >> /etc/hosts   
-      echo "172.20.12.64 ceph05.crd.ge.com ceph05" >> /etc/hosts   
-      echo "172.20.12.160 bootstrap.crd.ge.com bootstrap" >> /etc/hosts
-      echo "172.20.13.160 zk-1" >>  /etc/hosts
-      echo "172.20.13.161 zk-2" >>  /etc/hosts
-      echo "172.20.13.162 zk-3" >>  /etc/hosts
+      echo "x.x.12.60 ceph01.crd. ceph01" >> /etc/hosts   
+      echo "x.x.12.61 ceph02.crd. ceph02" >> /etc/hosts   
+      echo "x.x.12.62 ceph03.crd. ceph03" >> /etc/hosts   
+      echo "x.x.12.63 ceph04.crd. ceph04" >> /etc/hosts   
+      echo "x.x.12.64 ceph05.crd. ceph05" >> /etc/hosts   
+      echo "x.x.12.160 bootstrap.crd. bootstrap" >> /etc/hosts
+      echo "x.x.13.160 zk-1" >>  /etc/hosts
+      echo "x.x.13.161 zk-2" >>  /etc/hosts
+      echo "x.x.13.162 zk-3" >>  /etc/hosts
     fi
     tee /etc/apt/sources.list.d/ceph.list <<-'EOF'
 deb http://download.ceph.com/debian-hammer/ trusty main
@@ -151,7 +151,7 @@ EOF
        osd_op_num_threads_per_shard = 2  
 [mon.a]
         host = ceph01
-        mon addr = 172.20.12.60:6789
+        mon addr = x.x.12.60:6789
 [osd.0]
 	host = ceph01
 	osd data = /home/haitao/tmp_cbt/mnt/osd-device-0-data
@@ -479,11 +479,11 @@ EOF
     cat << EOF > "/etc/systemd/system/docker.service.d/override.conf"
 [Service]
 ExecStart=
-ExecStart=/usr/bin/docker daemon --storage-driver=overlay --storage-opt dm.no_warn_on_loop_devices=true -H fd:// -H tcp://0.0.0.0:4243  --insecure-registry bootstrap.crd.ge.com:5000 --cluster-store=zk://zk-1:2181,zk-2:2181,zk-3:2181 --cluster-advertise=${THIS_IP}:2376
+ExecStart=/usr/bin/docker daemon --storage-driver=overlay --storage-opt dm.no_warn_on_loop_devices=true -H fd:// -H tcp://0.0.0.0:4243  --insecure-registry bootstrap.crd.:5000 --cluster-store=zk://zk-1:2181,zk-2:2181,zk-3:2181 --cluster-advertise=${THIS_IP}:2376
 EOF
     tee /etc/systemd/system/docker.service.d/http-ptoxy.conf <<-'EOF'
 [Service]
-Environment="HTTP_PROXY=http://3.39.86.231:8080/" "HTTPS_PROXY=http://3.39.86.231:8080/" "NO_PROXY=localhost,127.0.0.1,bootstrap.crd.ge.com"
+Environment="HTTP_PROXY=http://x.x.86.231:8080/" "HTTPS_PROXY=http://x.x.86.231:8080/" "NO_PROXY=localhost,127.0.0.1,bootstrap.crd."
 EOF
     tee /usr/lib/systemd/system/docker.socket <<-'EOF'
 [Unit]
@@ -525,12 +525,12 @@ function main()
     done
     shift $(($OPTIND - 1))
     ROLES=$@
-    export http_proxy=http://3.39.86.231:8080
-    export https_proxy=http://3.39.86.231:8080
+    export http_proxy=http://x.x.86.231:8080
+    export https_proxy=http://x.x.86.231:8080
 cat <<'EOF' > /etc/resolv.conf
-nameserver 3.1.7.107 
-nameserver 3.1.6.27
-search crd.ge.com logon.ds.ge.com
+nameserver x.x.x.107 
+nameserver x.x.x.27
+search crd. logon.ds
 EOF
     #
     # update proxy cert for external pulls
